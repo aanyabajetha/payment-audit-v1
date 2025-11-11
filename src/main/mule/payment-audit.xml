@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="payment-audit-flow" doc:id="7d44160a-d87e-4c5f-953f-c0f17d2996dd" >
+		<scheduler doc:name="Every Day" doc:id="8a23fefb-c30e-4868-886d-211759c07459" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="INFO : START" doc:id="310019bf-1c45-4c5d-9fd3-acbfe101be0f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    appName: app.name,&#10;    flowName : flow.name,&#10;    position: "Flow Start",&#10;    message: "Payments for the day are being audited",&#10;    correlationId: correlationId&#10;}]'/>
+		<ee:transform doc:name="JSON data">
+			<ee:message>
+				<ee:set-payload resource="dwl/mock-payment.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Audit Summary">
+			<ee:message>
+				<ee:set-payload resource="dwl/audit-summary.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="INFO : Summary" doc:id="44f67b3b-5d98-4030-ba69-ed1e3e35ab3a" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"dailySummary": payload&#10;}]'/>
+		<logger level="INFO" doc:name="INFO : END" doc:id="f91611a4-bf42-4fc3-bd87-fca20a1ed6c5" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    appName: app.name,&#10;    flowName : flow.name,&#10;    position: "Flow End",&#10;    message: "Payment Audit Completed",&#10;    correlationId: correlationId&#10;}]'/>
+	</flow>
+</mule>
