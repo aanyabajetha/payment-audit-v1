@@ -54,8 +54,7 @@ jobs:
       - name: Verify artifact presence
         run: |
           echo "Verifying artifact from previous build..."
-          ls -l target || echo "Target folder missing, build failed!"
-          ls -l
+          ls -l || echo "Artifact missing, build failed!"
 
       - name: Optional Static Analysis / Validation
         run: echo "Perform static code validation or scanning here if needed."
@@ -66,7 +65,7 @@ jobs:
     needs: package
 
     steps:
-      - name: Trigger deployment workflow in main repo
+      - name: Trigger deployment workflow in central repo
         run: |
           echo "Triggering central deployment workflow..."
           curl -X POST \
@@ -76,10 +75,10 @@ jobs:
             -d '{
               "event_type": "deploy-trigger",
               "client_payload": {
-                "repo_owner": "aanyabajetha",
-                "repo": "payment-audit-v1",
-                "applicationName": "payment-audit-v1-sandbox",
-                "app_name": "payment-audit-v1-sandbox",
+                "repo_owner": "${{ github.repository_owner }}",
+                "repo": "${{ github.event.repository.name }}",
+                "applicationName": "${{ github.event.repository.name }}-sandbox",
+                "app_name": "${{ github.event.repository.name }}-sandbox",
                 "anypoint_uri": "https://anypoint.mulesoft.com",
                 "anypoint_provider": "MC",
                 "anypoint_env": "Sandbox",
