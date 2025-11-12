@@ -11,5 +11,4 @@
       <password>${env.ANYPOINT_CONNECTED_APP_CLIENT_ID}~?~${env.ANYPOINT_CONNECTED_APP_CLIENT_SECRET}</password>
     </server>
   </servers>
-
 </settings>
